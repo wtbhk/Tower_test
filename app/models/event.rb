@@ -19,16 +19,6 @@ class Event < ActiveRecord::Base
   scope :in_projects, -> (project_ids) { where(project_id: project_ids).recent }
 
   class << self
-    def find_with_access(user, team)
-      access = Access.where("user_id = ? AND team_id = ?", user.id, team.id).last.access
-      projects_ids = []
-      if access == Access::GUEST or access == Access::MEMBER
-        project_ids = user.projects.where(:team_id => team.id).pluck(:id)
-      else
-        project_ids = team.projects.pluck(:id)
-      end
-      Event.in_projects(project_ids)
-    end
     
     def create_todo(todo, user)
       create_event(todo, user, Event::TODO_CREATED, todo.title)      
